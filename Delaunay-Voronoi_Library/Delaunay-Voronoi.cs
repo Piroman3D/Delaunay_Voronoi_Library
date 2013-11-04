@@ -496,7 +496,11 @@ namespace Delaunay_Voronoi_Library
         #endregion _private_methods
 
         #region _public_methods
-        
+        /// <summary>
+        /// Natural Nearest Interpolation.
+        /// </summary>
+        /// <param name="verts">The vertices.</param>
+        /// <param name="parallel">parallel flag.</param>
         public List<Vertex> NatNearestInterpolation(List<Vertex> verts,bool parallel = false)
         {
 
@@ -549,6 +553,9 @@ namespace Delaunay_Voronoi_Library
             }
         }
 
+        /// <summary>
+        /// Natural Nearest Interpolation.
+        /// </summary>
         public List<Vertex> NatNearestInterpolation(double fromlongitude, double fromlatitude, double tolongitude, double tolatitude, int Nlongitude, int Nlatitude, bool parallel = false)
         {
             List<Vertex> f = new List<Vertex>();
@@ -611,7 +618,11 @@ namespace Delaunay_Voronoi_Library
                     return res;
             }
         }
-
+        /// <summary>
+        /// Natural Nearest Interpolation.
+        /// </summary>
+        /// <param name="longitude">The longitude.</param>
+        /// <param name="latitude">The latitude.</param>
         public Vertex NatNearestInterpolation(double longitude, double latitude)
         {
             Vertex w = new Vertex(longitude, latitude);
