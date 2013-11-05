@@ -65,55 +65,58 @@ namespace Delaunay_Voronoi_Library
         /// Initializes a new instance of the class Delaunay_Voronoi_Library.Delaunay_Voronoi with the specified vertices list.
         /// </summary>
         /// <param name="vertices">The vertices list.</param>
-        public Delaunay_Voronoi(HashSet<Vertex> vertices)
+        public Delaunay_Voronoi(List<Vertex> vertices)
         {
-            vinit.Add(new Vertex(0,90));
-            vinit.Add(new Vertex(0,-45));
-            vinit.Add(new Vertex(120,-45));
-            vinit.Add(new Vertex(240,-45));
-
-            triangles.Add(new triangle(vinit[0], vinit[1], vinit[2]));
-            triangles.Add(new triangle(vinit[0], vinit[1], vinit[3]));
-            triangles.Add(new triangle(vinit[0], vinit[2], vinit[3]));
-            triangles.Add(new triangle(vinit[1], vinit[2], vinit[3]));
-            
-            var df = DateTime.Now;
-            foreach (var j in vertices)
+            int lenght = vertices.Count, i = 2;
+            if (lenght < 4) { Console.WriteLine("слишком мало точек"); return; }
+            double A = 0, B = 0, C = 0;
+            Vertex v0 = null, v1 = null, v2 = null;
+            if (lenght > 2)
             {
-                addnewpoint(j);
-            }
-            Console.WriteLine("add {0}",DateTime.Now - df);
-            //condition is sufficient but not necessary
-            bool result = true;
-            foreach (var w in vinit)
-            foreach (var e in vinit)
-            {
-                foreach (var r in w.GetAdjacentTriangles)
+                v0 = vertices[0];
+                v1 = vertices[1];
+                do
                 {
-                    if ((r.GetVertices.Contains(e)) && (w != e))
-                    {
-                        result = false;
-                    }
-                }
+                    v2 = vertices[i++];
+                    A = (v1.Y - v0.Y) * (v2.Z - v0.Z) - (v1.Z - v0.Z) * (v2.Y - v0.Y);
+                    B = (v1.Z - v0.Z) * (v2.X - v0.X) - (v1.X - v0.X) * (v2.Z - v0.Z);
+                    C = (v1.X - v0.X) * (v2.Y - v0.Y) - (v1.Y - v0.Y) * (v2.X - v0.X);
+                } while (A == 0 && B == 0 && C == 0 && i < lenght);
             }
-            if (result == false)
+
+            if (A != 0 || B != 0 || C != 0)
             {
+                var er = new double[] { v0.X + v1.X + v2.X, v0.Y + v1.Y + v2.Y, v0.Z + v1.Z + v2.Z };
+                var rty = Math.Sqrt(er[0] * er[0] + er[1] * er[1] + er[2] * er[2]);
+                er[0] = -er[0] / rty; er[1] =- er[1] / rty; er[2] = -er[2] / rty;
+                var vini = new Vertex(er, double.NaN);
+
+                this.vertices.Add(v0);
+                this.vertices.Add(v1);
+                this.vertices.Add(v2);
+                this.vinit.Add(vini);
+                this.vertices.Add(vini);
+
+                triangles.Add(new triangle(v1, v2, v0));
+                triangles.Add(new triangle(v0, v1, vini));
+                triangles.Add(new triangle(v0, v2, vini));
+                triangles.Add(new triangle(v1, v2, vini));
+
+                var df = DateTime.Now;
+                foreach (var j in vertices)
+                {
+                    addnewpoint(j);
+                }
+                Console.WriteLine("add {0}", DateTime.Now - df);
                 
-                triangles = null;
-                this.vertices = null;
-                vinit = null;
-                Console.WriteLine("Triangulation can not be built: Insufficient number of control points...");
-                return;
+
+                //foreach (var e in vinit)
+                //    DeletePoint(e);
+
+                //vinit.Clear();
+
+                Voronoi();
             }
-            //
-
-            foreach (var e in vinit)
-                DeletePoint(e);
-
-            vinit.Clear();
-
-            Voronoi();
-
         }
 
         #endregion _constructors
@@ -187,8 +190,8 @@ namespace Delaunay_Voronoi_Library
         {
             foreach (var w in vinit.Where(a => Math.Abs(x.X - a.X) < 0.0000001 && Math.Abs(x.Y - a.Y) < 0.0000001 && Math.Abs(x.Z - a.Z) < 0.0000001))
             {
-                vertices.Add(w);
                 w.SetNewPosition(x.Longitude, x.Latitude);
+                w.Value = x.Value;
                 vinit.Remove(w);
                 return 0;
             }

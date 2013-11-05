@@ -15,7 +15,7 @@
             </summary>
             <param name="delaunay_voronoi">The Delaunay_Voronoi class.</param>
         </member>
-        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.#ctor(System.Collections.Generic.HashSet{Delaunay_Voronoi_Library.Vertex})">
+        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.#ctor(System.Collections.Generic.List{Delaunay_Voronoi_Library.Vertex})">
             <summary>
             Initializes a new instance of the class Delaunay_Voronoi_Library.Delaunay_Voronoi with the specified vertices list.
             </summary>

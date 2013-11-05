@@ -48,6 +48,7 @@ namespace Delaunay_Voronoi_Library
         {
             this.value = value;
             this.Position = Position;
+            adjacent_triangles = new List<triangle>();
         }
 
         /// <summary>
