@@ -108,12 +108,13 @@ namespace Delaunay_Voronoi_Library
                     addnewpoint(j);
                 }
                 Console.WriteLine("add {0}", DateTime.Now - df);
-                
 
-                //foreach (var e in vinit)
-                //    DeletePoint(e);
+                foreach (var e in vinit)
+                {
+                    if (TryDeletePoint(e) == false) Console.WriteLine("Невозможно удалить точку...к сожалению...");
+                }
 
-                //vinit.Clear();
+                vinit.Clear();
 
                 Voronoi();
             }
@@ -362,8 +363,111 @@ namespace Delaunay_Voronoi_Library
                 }
             }
         }
+        
+        bool TryDeletePoint(Vertex v)
+        {
+            List<Edge> edges = new List<Edge>();
+            List<Vertex> verts = new List<Vertex>();
+            List<triangle> trsw = new List<triangle>();
+            Dictionary<Vertex, Vertex> parallelcopy = new Dictionary<Vertex, Vertex>();
+            
+            foreach (var a in v.GetAdjacentTriangles)
+            {
+                foreach (var w in a.GetVertices)
+                {
+                    if (w != v && !verts.Contains(w))
+                    {
+                        verts.Add(w);
+                    }
+                }
+                List<Vertex> tempo = new List<Vertex>();
+                foreach (var w in a.GetVertices)
+                {
+                    if (w != v)
+                    {
+                        tempo.Add(w);
+                    }
+                }
+                Vertex p1=tempo[0],p2=tempo[1];
+                edges.Add(new Edge(p1,p2));
+            }
+            vertices.Remove(v);
+            Vertex v1 = verts[0],
+                   v2 = edges.First(a => a.GetVertexes.Contains(v1)).GetVertexes.Single(b => b != v1),
+                   v3 = edges.Single(a => (a.GetVertexes.Contains(v2)) && (!a.GetVertexes.Contains(v1))).GetVertexes.Single(b => b != v2);
 
-        void DeletePoint(Vertex v, bool p = true)
+            int maxit = 0;
+            if (verts.Count == 4) maxit = 2;
+            if (verts.Count > 4) maxit = verts.Count;
+
+            while (verts.Count > 3)
+            {
+                triangle t1 = new triangle(v1, v2, v3,false);
+                bool y = true;
+                foreach (var v4 in vertices)
+                {
+                    int c = Math.Sign(t1.SignVertex(v4));
+                    if ((c != 0) && (c != t1.GetSignCenter))
+                    {
+                        y = false;
+                        break;
+                    }
+                }
+
+                if (y == true)
+                {
+                    var g = new triangle(v1, v3, new Vertex(new double[] { 0, 0, 0 }), false);
+                    if (Math.Sign(g.SignVertex(v2)) == Math.Sign(g.SignVertex(v)))
+                    {
+                        maxit--;
+                        if (maxit == 0) { vertices.Add(v); return false; }
+                        v1 = v2;
+                        v2 = v3;
+                        v3 = edges.Single(a => (a.GetVertexes.Contains(v2)) && (!a.GetVertexes.Contains(v1))).GetVertexes.Single(b => b != v2);
+
+                    }
+                    else
+                    {
+                        verts.Remove(v2);
+                        if (verts.Count == 4) maxit = 2;
+                        if (verts.Count > 4) maxit = verts.Count;
+                        edges.RemoveAll(a => a.GetVertexes.Contains(v2));
+                        edges.Add(new Edge(v1, v3));
+                        trsw.Add(t1);
+                        v2 = v3;
+                        v3 = edges.Single(a => (a.GetVertexes.Contains(v2)) && (!a.GetVertexes.Contains(v1))).GetVertexes.Single(b => b != v2);
+                    }
+                }
+
+                if (y == false)
+                {
+                    maxit--;
+                    if (maxit == 0) { vertices.Add(v); return false; }
+                    v1 = v2;
+                    v2 = v3;
+                    v3 = edges.Single(a => (a.GetVertexes.Contains(v2)) && (!a.GetVertexes.Contains(v1))).GetVertexes.Single(b => b != v2);
+                }
+            }
+            var fgh = new triangle(verts[0], verts[1], verts[2],false);
+            trsw.Add(fgh);
+
+            maxit = v.GetAdjacentTriangles.Count;
+            for (int k = 0; k < maxit;k++ )
+            {
+                var o = v.GetAdjacentTriangles[0];
+                o.deltr();
+                triangles.Remove(o);
+            }
+
+            foreach (var o in trsw)
+            {
+                triangles.Add(new triangle(o.GetVertices[0], o.GetVertices[1], o.GetVertices[2]));
+            }
+
+            return true;
+        }
+
+        void DeletePoint(Vertex v)
         {
             List<Edge> edges = new List<Edge>();
             List<Vertex> verts = new List<Vertex>();
