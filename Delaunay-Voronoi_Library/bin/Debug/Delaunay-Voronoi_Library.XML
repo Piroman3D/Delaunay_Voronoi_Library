@@ -26,24 +26,26 @@
             Constructs voronoi diagram from delaunay triangulation.
             </summary>
         </member>
-        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Collections.Generic.List{Delaunay_Voronoi_Library.Vertex},System.Boolean)">
+        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Collections.Generic.List{Delaunay_Voronoi_Library.Vertex},System.Boolean,System.Boolean)">
             <summary>
             Natural Nearest Interpolation.
             </summary>
             <param name="verts">The vertices.</param>
             <param name="parallel">parallel flag.</param>
+            <param name="ExceptNaN">Except NaN points </param>
         </member>
-        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Double,System.Double,System.Double,System.Double,System.Int32,System.Int32,System.Boolean,System.Boolean)">
             <summary>
             Natural Nearest Interpolation.
             </summary>
         </member>
-        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Double,System.Double)">
+        <member name="M:Delaunay_Voronoi_Library.Delaunay_Voronoi.NatNearestInterpolation(System.Double,System.Double,System.Boolean)">
             <summary>
             Natural Nearest Interpolation.
             </summary>
             <param name="longitude">The longitude.</param>
             <param name="latitude">The latitude.</param>
+            <param name="ExceptNaN">Except NaN points </param>
         </member>
         <member name="P:Delaunay_Voronoi_Library.Delaunay_Voronoi.GetVoronoiCells">
             <summary>

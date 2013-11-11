@@ -544,7 +544,7 @@ namespace Delaunay_Voronoi_Library
         }
 
 
-        void NatNearestInterpolation(Vertex vert)
+        void NatNearestInterpolation(Vertex vert, bool ExceptNaN)
         {
             pseudopol.Clear();
             pseuvotr.Clear();
@@ -578,15 +578,20 @@ namespace Delaunay_Voronoi_Library
             }
 
             lv.Remove(vert);
-
-            double sq = pseudopol.Single(a => a.GetCellCentr == vert).GetSquare;
+            double sq = 0;
+            //double sq = pseudopol.Single(a => a.GetCellCentr == vert).GetSquare;
             foreach (var q in lv)
             {
-                double sqss = q.Voronoi_Cell.GetSquare;
-                double sqs = pseudopol.Single(a => a.GetCellCentr == q).GetSquare;
-                vert.Value += (sqss - sqs) / sq * q.Value;
+                if ((!ExceptNaN) || (ExceptNaN && !double.IsNaN(q.Value)))
+                {
+                    double sqss = q.Voronoi_Cell.GetSquare;
+                    double sqs = pseudopol.Single(a => a.GetCellCentr == q).GetSquare;
+                    double delta = sqss - sqs;
+                    vert.Value += delta * q.Value;
+                    sq += delta;
+                }
             }
-
+            vert.Value /= sq;
             foreach (var n in newtriangles)
             {
                 n.deltr();
@@ -608,7 +613,8 @@ namespace Delaunay_Voronoi_Library
         /// </summary>
         /// <param name="verts">The vertices.</param>
         /// <param name="parallel">parallel flag.</param>
-        public List<Vertex> NatNearestInterpolation(List<Vertex> verts,bool parallel = false)
+        /// <param name="ExceptNaN">Except NaN points </param>
+        public List<Vertex> NatNearestInterpolation(List<Vertex> verts, bool parallel = false, bool ExceptNaN = true)
         {
 
             if (parallel == false)
@@ -617,7 +623,7 @@ namespace Delaunay_Voronoi_Library
                 foreach (var w in verts)
                 {
                     Vertex v =new Vertex(w);
-                    NatNearestInterpolation(v);
+                    NatNearestInterpolation(v, ExceptNaN);
                     res.Add(v);
                 }
                 return res;
@@ -646,7 +652,7 @@ namespace Delaunay_Voronoi_Library
                     for (int j = _h1; j < _h2; j++)
                     {
                         Vertex v = new Vertex(verts[i]);
-                        NatNearestInterpolation(v);
+                        NatNearestInterpolation(v,ExceptNaN);
                         d.Add(v);
                     }
                     lock (res)
@@ -663,7 +669,7 @@ namespace Delaunay_Voronoi_Library
         /// <summary>
         /// Natural Nearest Interpolation.
         /// </summary>
-        public List<Vertex> NatNearestInterpolation(double fromlongitude, double fromlatitude, double tolongitude, double tolatitude, int Nlongitude, int Nlatitude, bool parallel = false)
+        public List<Vertex> NatNearestInterpolation(double fromlongitude, double fromlatitude, double tolongitude, double tolatitude, int Nlongitude, int Nlatitude, bool parallel = false, bool ExceptNaN = true)
         {
             List<Vertex> f = new List<Vertex>();
             double latd = (tolatitude - fromlatitude) / Nlatitude;
@@ -679,7 +685,7 @@ namespace Delaunay_Voronoi_Library
                 foreach (var w in f)
                 {
                     Vertex v = new Vertex(w);
-                    NatNearestInterpolation(v);
+                    NatNearestInterpolation(v,ExceptNaN);
                     res.Add(v);
                 }
                 return res;
@@ -712,7 +718,7 @@ namespace Delaunay_Voronoi_Library
                     for (int j = _h1; j < _h2; j++)
                     {
                         Vertex v = new Vertex(f[j]);
-                        dvm[i].NatNearestInterpolation(v);
+                        dvm[i].NatNearestInterpolation(v,ExceptNaN);
                         d.Add(v);
                     }
                     lock (res)
@@ -730,11 +736,12 @@ namespace Delaunay_Voronoi_Library
         /// </summary>
         /// <param name="longitude">The longitude.</param>
         /// <param name="latitude">The latitude.</param>
-        public Vertex NatNearestInterpolation(double longitude, double latitude)
+        /// <param name="ExceptNaN">Except NaN points </param>
+        public Vertex NatNearestInterpolation(double longitude, double latitude, bool ExceptNaN = true)
         {
             Vertex w = new Vertex(longitude, latitude);
             
-            NatNearestInterpolation(w);
+            NatNearestInterpolation(w,ExceptNaN);
             
             return w;
         }
